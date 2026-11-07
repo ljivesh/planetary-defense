@@ -1,0 +1,21 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Backend
+backend/bin/
+backend/tmp/
+*.test
+coverage.out
+
+# Frontend (see frontend/.gitignore too)
+node_modules/
+frontend/dist/

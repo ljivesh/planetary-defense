@@ -1,0 +1,170 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Data-viz roles (validated with the dataviz palette validator against --card). */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+
+  /* Status roles: fixed in both themes, always paired with an icon + label. */
+  --color-status-good: #0ca30c;
+  --color-status-warning: #fab219;
+  --color-status-serious: #ec835a;
+  --color-status-critical: #d03b3b;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+/* Light theme */
+:root {
+  --radius: 0.625rem;
+
+  --background: #f4f6f9;
+  --foreground: #0b1220;
+  --card: #ffffff;
+  --card-foreground: #0b1220;
+  --popover: #ffffff;
+  --popover-foreground: #0b1220;
+  --primary: #0e7fb0;
+  --primary-foreground: #ffffff;
+  --secondary: #eef1f5;
+  --secondary-foreground: #0b1220;
+  --muted: #eef1f5;
+  --muted-foreground: #5b6578;
+  --accent: #e6ebf2;
+  --accent-foreground: #0b1220;
+  --destructive: #d03b3b;
+  --border: rgb(11 18 32 / 0.1);
+  --input: rgb(11 18 32 / 0.14);
+  --ring: #0e7fb0;
+
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-grid: #e5e8ee;
+  --chart-axis: #c7ccd6;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0b1220;
+  --sidebar-primary: #0e7fb0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef1f5;
+  --sidebar-accent-foreground: #0b1220;
+  --sidebar-border: rgb(11 18 32 / 0.08);
+  --sidebar-ring: #0e7fb0;
+}
+
+/* Dark "mission control" theme (default) */
+.dark {
+  --background: #070b14;
+  --foreground: #e8edf5;
+  --card: #0e1524;
+  --card-foreground: #e8edf5;
+  --popover: #111a2c;
+  --popover-foreground: #e8edf5;
+  --primary: #4cc9f0;
+  --primary-foreground: #04121a;
+  --secondary: #16203a;
+  --secondary-foreground: #e8edf5;
+  --muted: #16203a;
+  --muted-foreground: #8a96ab;
+  --accent: #1a2540;
+  --accent-foreground: #e8edf5;
+  --destructive: #e66767;
+  --border: rgb(148 163 184 / 0.14);
+  --input: rgb(148 163 184 / 0.2);
+  --ring: #4cc9f0;
+
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-grid: #1d2840;
+  --chart-axis: #2c3854;
+
+  --sidebar: #0a101d;
+  --sidebar-foreground: #e8edf5;
+  --sidebar-primary: #4cc9f0;
+  --sidebar-primary-foreground: #04121a;
+  --sidebar-accent: #16203a;
+  --sidebar-accent-foreground: #e8edf5;
+  --sidebar-border: rgb(148 163 184 / 0.1);
+  --sidebar-ring: #4cc9f0;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply min-h-dvh bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Columns of numbers align; standalone figures keep proportional digits. */
+@utility num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle star-field backdrop (used as dark:starfield). */
+@utility starfield {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgb(255 255 255 / 0.35), transparent),
+    radial-gradient(1px 1px at 70% 80%, rgb(255 255 255 / 0.25), transparent),
+    radial-gradient(1px 1px at 40% 70%, rgb(255 255 255 / 0.2), transparent),
+    radial-gradient(1.5px 1.5px at 85% 15%, rgb(255 255 255 / 0.3), transparent),
+    radial-gradient(1px 1px at 10% 85%, rgb(255 255 255 / 0.2), transparent);
+  background-size: 480px 480px;
+}
