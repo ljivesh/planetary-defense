@@ -6,6 +6,7 @@ viewer, and fireball (bolide) events.
 
 - **Frontend:** React 19 · TypeScript 7 · Vite 8 · Tailwind CSS v4 · shadcn/ui (Radix) · TanStack Query & Table · React Router 8 · Recharts · react-three-fiber · zod
 - **Backend:** Go 1.26 · chi · otter (TTL cache with load coalescing) · slog · caarlos0/env
+- **Design:** an "instrument data sheet" system (near-black canvas, hairline rules, mono figures, one amber signal colour), specified in [`docs/DESIGN.md`](docs/DESIGN.md). Read it before changing UI.
 
 ```
 ┌───────────────┐   /api/v1/*   ┌──────────────────────────┐   HTTPS   ┌──────────────────────┐
@@ -68,13 +69,14 @@ backend/
 frontend/src/
   app/                   app root, providers, router, theme
   components/ui/         shadcn/ui primitives (generated)
-  components/layout/     app shell, sidebar, topbar, search, theme toggle
-  components/common/     DataTable (TanStack Table v9), StatCard, StatusBadge, states…
+  components/layout/     app shell, masthead (nav, "/" search, UTC clock, theme switch), page header
+  components/common/     Section, Readout, RiskMark, DataTable (TanStack Table v9), PlainTable, chart theme, states…
   features/<feature>/    schemas.ts (zod) · api.ts (query options) · hooks/ · components/
                          close-approaches · risk · objects · orbit · fireballs · summary
   hooks/                 useUrlState, useDebounce, useMediaQuery, useTheme
   lib/                   api-client, query-client, format, orbital (Kepler), constants
   pages/                 route components (lazy-loaded)
+docs/DESIGN.md           the visual system: tokens, type, components, data-viz and 3D rules
 docs/IDEAS.md            the other brainstormed project ideas and the roadmap
 ```
 
@@ -85,8 +87,10 @@ docs/IDEAS.md            the other brainstormed project ideas and the roadmap
   with albedo p between 0.05 and 0.25. That gives a range, not a single number.
 - **Palermo scale:** log₁₀ of the hazard relative to the background impact risk. Below −2 means
   no likely consequence; −2 to 0 merits monitoring; above 0 is of concern. **Torino** (0–10) is the public scale.
-- **Orbit viewer:** two-body Keplerian propagation from SBDB osculating elements. It is fine for
-  visualization, not for precise ephemerides (planetary perturbations are ignored).
+- **Orbit viewer:** two-body Keplerian propagation from SBDB osculating elements. Planets use JPL's mean
+  J2000 elements (Standish). The orbit is drawn solid above the ecliptic and dashed below, with drop lines,
+  nodes (☊ ☋), perihelion/aphelion (q/Q) and the next Earth encounter. It is fine for visualization, not for
+  precise ephemerides (planetary perturbations are ignored).
 
 ## Data credits
 

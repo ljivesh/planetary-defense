@@ -18,6 +18,9 @@ object profiles with a 3D orbit viewer, and fireball (bolide) events.
 - [x] Overview KPIs, close-approach timeline, risk table, fireball list
 - [x] Object profile: orbit elements, physical params, Sentry assessment, encounter history
 - [x] 3D orbit viewer (two-body Kepler propagation, time scrubber)
+- [x] Instrument redesign (`docs/DESIGN.md`): masthead, numbered sections, readouts, distance strip, mono data sheets
+- [x] Orbit viewer v2: inner planets, above/below-ecliptic split with drop lines, nodes and apsides, next-encounter
+      marker with jump, TOP/SIDE/FREE camera presets, speed and reverse, fading trail, label collision handling
 - [ ] **Fireball world map** (MapLibre GL) with energy-scaled markers
 - [ ] **Scout API** feed: unconfirmed NEOCP objects with hypothetical impact scores
 - [ ] **Horizons API** ephemerides for accurate positions (replace two-body approximation near encounters)
