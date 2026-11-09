@@ -1,11 +1,8 @@
-import { Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { ErrorState } from '@/components/common/error-state'
 import { LoadingRows } from '@/components/common/loading-block'
-import { SectionCard } from '@/components/common/section-card'
 import { PageHeader } from '@/components/layout/page-header'
-import { Input } from '@/components/ui/input'
 import { RiskTable } from '@/features/risk/components/risk-table'
 import { useRiskList } from '@/features/risk/hooks/use-risk-list'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -23,29 +20,31 @@ export default function RiskPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Source · CNEOS Sentry"
         title="Impact risk"
-        description="Objects with a non-zero chance of hitting Earth in the next century, from the JPL Sentry system"
-        actions={
-          <div className="relative w-64">
-            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Filter by name…"
-              aria-label="Filter risk table by name"
-              className="pl-8"
-            />
-          </div>
-        }
+        description="Every object with a non-zero chance of hitting Earth in the next century, sorted by the cumulative Palermo scale. Most leave the list once more observations refine their orbits."
       />
-      <SectionCard
-        title="Sentry risk table"
-        description={
-          data
-            ? `${filtered?.length.toLocaleString()} of ${data.length.toLocaleString()} objects · sorted by cumulative Palermo scale`
-            : 'Loading…'
-        }
-      >
+
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-hairline py-3">
+        <label htmlFor="risk-filter" className="eyebrow">
+          Filter
+        </label>
+        <input
+          id="risk-filter"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="name or designation"
+          className="h-7 w-56 rounded-[2px] border border-hairline-strong bg-transparent px-2 font-mono text-xs text-ink outline-none placeholder:text-muted-ink focus:border-signal"
+        />
+        {data && (
+          <span className="eyebrow ml-auto">
+            <span className="text-ink">{filtered?.length.toLocaleString()}</span> of {data.length.toLocaleString()}{' '}
+            objects
+          </span>
+        )}
+      </div>
+
+      <div className="mt-8">
         {isPending ? (
           <LoadingRows rows={12} />
         ) : isError ? (
@@ -53,7 +52,7 @@ export default function RiskPage() {
         ) : (
           <RiskTable data={filtered ?? []} isFetching={isFetching} />
         )}
-      </SectionCard>
+      </div>
     </>
   )
 }

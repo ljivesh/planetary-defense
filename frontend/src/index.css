@@ -2,150 +2,115 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tokens: see docs/DESIGN.md. */
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted-ink: var(--muted-ink);
+  --color-signal: var(--signal);
 
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  /* shadcn roles, mapped onto the tokens above. */
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --color-card: var(--canvas);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--canvas);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--canvas);
+  --color-secondary: var(--surface);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--muted-ink);
+  --color-accent: var(--surface);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: #d03b3b;
+  --color-border: var(--hairline);
+  --color-input: var(--hairline-strong);
+  --color-ring: var(--signal);
 
-  /* Data-viz roles (validated with the dataviz palette validator against --card). */
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-grid: var(--chart-grid);
-  --color-chart-axis: var(--chart-axis);
+  /* Data-viz roles (validated with the dataviz palette validator against --canvas). */
+  --color-chart-signal: var(--chart-signal);
+  --color-chart-earth: var(--chart-earth);
+  --color-chart-neutral: var(--chart-neutral);
 
-  /* Status roles: fixed in both themes, always paired with an icon + label. */
+  /* Status roles: risk only, always a square glyph + text label. */
   --color-status-good: #0ca30c;
   --color-status-warning: #fab219;
   --color-status-serious: #ec835a;
   --color-status-critical: #d03b3b;
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
 }
 
-/* Light theme */
+/* Light: the data sheet printed on paper. */
 :root {
-  --radius: 0.625rem;
+  --radius: 2px;
 
-  --background: #f4f6f9;
-  --foreground: #0b1220;
-  --card: #ffffff;
-  --card-foreground: #0b1220;
-  --popover: #ffffff;
-  --popover-foreground: #0b1220;
-  --primary: #0e7fb0;
-  --primary-foreground: #ffffff;
-  --secondary: #eef1f5;
-  --secondary-foreground: #0b1220;
-  --muted: #eef1f5;
-  --muted-foreground: #5b6578;
-  --accent: #e6ebf2;
-  --accent-foreground: #0b1220;
-  --destructive: #d03b3b;
-  --border: rgb(11 18 32 / 0.1);
-  --input: rgb(11 18 32 / 0.14);
-  --ring: #0e7fb0;
+  --canvas: #fafaf9;
+  --surface: #f2f2f0;
+  --hairline: #e4e4e2;
+  --hairline-strong: #c9c9c6;
+  --ink: #0a0a0a;
+  --body: #525252;
+  --muted-ink: #8a8a8a;
+  --signal: #b45309;
 
-  --chart-1: #2a78d6;
-  --chart-2: #eb6834;
-  --chart-3: #1baf7a;
-  --chart-grid: #e5e8ee;
-  --chart-axis: #c7ccd6;
-
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0b1220;
-  --sidebar-primary: #0e7fb0;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef1f5;
-  --sidebar-accent-foreground: #0b1220;
-  --sidebar-border: rgb(11 18 32 / 0.08);
-  --sidebar-ring: #0e7fb0;
+  --chart-signal: #b45309;
+  --chart-earth: #2a6fc9;
+  --chart-neutral: #737373;
 }
 
-/* Dark "mission control" theme (default) */
+/* Dark: native state. */
 .dark {
-  --background: #070b14;
-  --foreground: #e8edf5;
-  --card: #0e1524;
-  --card-foreground: #e8edf5;
-  --popover: #111a2c;
-  --popover-foreground: #e8edf5;
-  --primary: #4cc9f0;
-  --primary-foreground: #04121a;
-  --secondary: #16203a;
-  --secondary-foreground: #e8edf5;
-  --muted: #16203a;
-  --muted-foreground: #8a96ab;
-  --accent: #1a2540;
-  --accent-foreground: #e8edf5;
-  --destructive: #e66767;
-  --border: rgb(148 163 184 / 0.14);
-  --input: rgb(148 163 184 / 0.2);
-  --ring: #4cc9f0;
+  --canvas: #0a0a0a;
+  --surface: #111111;
+  --hairline: #262626;
+  --hairline-strong: #3a3a3a;
+  --ink: #ededed;
+  --body: #a3a3a3;
+  --muted-ink: #6b6b6b;
+  --signal: #ffb224;
 
-  --chart-1: #3987e5;
-  --chart-2: #d95926;
-  --chart-3: #199e70;
-  --chart-grid: #1d2840;
-  --chart-axis: #2c3854;
-
-  --sidebar: #0a101d;
-  --sidebar-foreground: #e8edf5;
-  --sidebar-primary: #4cc9f0;
-  --sidebar-primary-foreground: #04121a;
-  --sidebar-accent: #16203a;
-  --sidebar-accent-foreground: #e8edf5;
-  --sidebar-border: rgb(148 163 184 / 0.1);
-  --sidebar-ring: #4cc9f0;
+  --chart-signal: #c78213;
+  --chart-earth: #3f86dc;
+  --chart-neutral: #8a8a8a;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-hairline outline-signal/60;
   }
   html {
     @apply font-sans antialiased;
     color-scheme: light;
+    font-feature-settings: 'ss01';
   }
   html.dark {
     color-scheme: dark;
   }
   body {
-    @apply min-h-dvh bg-background text-foreground;
+    @apply min-h-dvh bg-canvas text-ink;
+  }
+  ::selection {
+    background: var(--signal);
+    color: var(--canvas);
   }
   button:not(:disabled),
   [role='button']:not(:disabled) {
@@ -153,18 +118,47 @@
   }
 }
 
-/* Columns of numbers align; standalone figures keep proportional digits. */
+/* Mono figures with tabular numerals: every number on the page. */
+@utility figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 0;
+}
+
+/* Kept for places that want tabular digits in the sans face. */
 @utility num {
   font-variant-numeric: tabular-nums;
 }
 
-/* Subtle star-field backdrop (used as dark:starfield). */
-@utility starfield {
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgb(255 255 255 / 0.35), transparent),
-    radial-gradient(1px 1px at 70% 80%, rgb(255 255 255 / 0.25), transparent),
-    radial-gradient(1px 1px at 40% 70%, rgb(255 255 255 / 0.2), transparent),
-    radial-gradient(1.5px 1.5px at 85% 15%, rgb(255 255 255 / 0.3), transparent),
-    radial-gradient(1px 1px at 10% 85%, rgb(255 255 255 / 0.2), transparent);
-  background-size: 480px 480px;
+/*
+ * Typographic roles live in the components layer so that plain utilities
+ * (text-ink, text-signal, font-*) always override their defaults.
+ */
+@layer components {
+  /* Mono uppercase label: section indices, field labels, table headers. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-ink);
+  }
+
+  /* Smallest mono label: 3D labels, chart annotations. */
+  .micro {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .display {
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
 }

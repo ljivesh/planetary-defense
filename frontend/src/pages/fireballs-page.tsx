@@ -1,6 +1,6 @@
 import { ErrorState } from '@/components/common/error-state'
 import { LoadingChart, LoadingRows } from '@/components/common/loading-block'
-import { SectionCard } from '@/components/common/section-card'
+import { Section } from '@/components/common/section'
 import { PageHeader } from '@/components/layout/page-header'
 import { FireballEnergyChart } from '@/features/fireballs/components/fireball-energy-chart'
 import { FireballTable } from '@/features/fireballs/components/fireball-table'
@@ -12,20 +12,26 @@ export default function FireballsPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Source · US Government sensors via JPL"
         title="Fireballs"
-        description="Bright meteors (bolides) detected by US Government sensors, via the JPL Fireball API"
+        description="Bright meteors (bolides) seen exploding in the atmosphere. Energies are estimated from the light curve; most are metre-sized rocks that never reach the ground."
       />
       {isError ? (
         <ErrorState error={error} onRetry={() => refetch()} />
       ) : (
-        <div className="space-y-6">
-          <SectionCard title="Impact energy over time" description="Log scale · kilotons of TNT equivalent">
+        <>
+          <Section index="01" label="Impact energy" note="Kilotons of TNT equivalent, log scale.">
             {isPending ? <LoadingChart /> : <FireballEnergyChart data={data} />}
-          </SectionCard>
-          <SectionCard title="Events" description={data ? `${data.length} most recent events` : 'Loading…'}>
+          </Section>
+          <Section
+            index="02"
+            label="Events"
+            note={data ? `${data.length} most recent events.` : undefined}
+            className="mt-16"
+          >
             {isPending ? <LoadingRows /> : <FireballTable data={data} isFetching={isFetching} />}
-          </SectionCard>
-        </div>
+          </Section>
+        </>
       )}
     </>
   )

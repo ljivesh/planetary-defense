@@ -1,4 +1,4 @@
-import { format, formatDistanceToNowStrict, isValid, parseISO } from 'date-fns'
+import { formatDistanceToNowStrict, isValid, parseISO } from 'date-fns'
 
 import { AU_KM, LD_AU } from '@/lib/constants'
 
@@ -23,6 +23,9 @@ export function formatCompact(n: number | null | undefined): string {
 }
 
 // ---------- domain values ----------
+
+/** Strips JPL's parentheses from provisional names: "(2026 VK2)" → "2026 VK2". */
+export const displayName = (name: string) => name.replace(/^\((.*)\)$/, '$1')
 
 /** Lunar distances, the most intuitive unit for close approaches. */
 export function formatLd(au: number): string {
@@ -101,14 +104,33 @@ function toDate(value: string | Date): Date | null {
   return isValid(d) ? d : null
 }
 
+// All dates are shown in UTC (the data is in UTC, and so is the masthead clock).
+const DATE_UTC = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })
+const TIME_UTC = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })
+
+/** "Nov 8, 2026" (UTC). */
 export function formatDate(value: string | Date): string {
   const d = toDate(value)
-  return d ? format(d, 'MMM d, yyyy') : EM_DASH
+  return d ? DATE_UTC.format(d) : EM_DASH
 }
 
+/** "Nov 8, 2026 21:34 UTC". */
 export function formatDateTime(value: string | Date): string {
   const d = toDate(value)
-  return d ? `${format(d, 'MMM d, yyyy HH:mm')} UTC` : EM_DASH
+  return d ? `${DATE_UTC.format(d)} ${TIME_UTC.format(d)} UTC` : EM_DASH
+}
+
+/** Mission-clock countdown to `target`: "T− 1d 16:22:05", or "T+ …" once passed. */
+export function formatCountdown(target: string | Date, now: number): string {
+  const d = toDate(target)
+  if (!d) return EM_DASH
+  const diff = d.getTime() - now
+  const total = Math.floor(Math.abs(diff) / 1000)
+  const days = Math.floor(total / 86_400)
+  const hms = [Math.floor(total / 3600) % 24, Math.floor(total / 60) % 60, total % 60]
+    .map((n) => String(n).padStart(2, '0'))
+    .join(':')
+  return `T${diff >= 0 ? '−' : '+'} ${days > 0 ? `${days}d ` : ''}${hms}`
 }
 
 /** "in 3 days" / "2 months ago". */

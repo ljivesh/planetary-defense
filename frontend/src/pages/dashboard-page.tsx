@@ -1,33 +1,23 @@
-import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router'
+import { useMemo } from 'react'
 
 import { ErrorState } from '@/components/common/error-state'
 import { LoadingChart, LoadingRows } from '@/components/common/loading-block'
-import { SectionCard } from '@/components/common/section-card'
-import { PageHeader } from '@/components/layout/page-header'
-import { Button } from '@/components/ui/button'
+import { Section } from '@/components/common/section'
+import { TextLink } from '@/components/common/text-link'
 import { ApproachTimelineChart } from '@/features/close-approaches/components/approach-timeline-chart'
+import { ClosestFlyby, ClosestFlybySkeleton } from '@/features/close-approaches/components/closest-flyby'
 import { APPROACH_FILTER_DEFAULTS, toApproachQuery } from '@/features/close-approaches/filters'
 import { useCloseApproaches } from '@/features/close-approaches/hooks/use-close-approaches'
+import { approachKey, closestApproach } from '@/features/close-approaches/lib'
 import { LatestFireballs } from '@/features/fireballs/components/latest-fireballs'
 import { useFireballs } from '@/features/fireballs/hooks/use-fireballs'
 import { TopRiskList } from '@/features/risk/components/top-risk-list'
 import { useRiskList } from '@/features/risk/hooks/use-risk-list'
-import { KpiRow } from '@/features/summary/components/kpi-row'
+import { SummaryReadouts } from '@/features/summary/components/summary-readouts'
 import { useSummary } from '@/features/summary/hooks/use-summary'
-import { formatRelative } from '@/lib/format'
 
 const UPCOMING_QUERY = toApproachQuery(APPROACH_FILTER_DEFAULTS)
-
-function ViewAll({ to }: { to: string }) {
-  return (
-    <Button variant="ghost" size="sm" asChild>
-      <Link to={to}>
-        View all <ArrowRight />
-      </Link>
-    </Button>
-  )
-}
+const WINDOW_DAYS = Number(APPROACH_FILTER_DEFAULTS.window)
 
 export default function DashboardPage() {
   const summary = useSummary()
@@ -35,40 +25,56 @@ export default function DashboardPage() {
   const risk = useRiskList()
   const fireballs = useFireballs(50)
 
+  const closest = useMemo(() => closestApproach(approaches.data ?? []), [approaches.data])
+
   return (
     <>
-      <PageHeader
-        title="Overview"
-        description={
-          summary.data
-            ? `Near-Earth object activity · updated ${formatRelative(summary.data.generatedAt)}`
-            : 'Near-Earth object activity from NASA/JPL'
-        }
-      />
+      <h1 className="sr-only">Planetary defense overview</h1>
 
-      {summary.isError ? (
-        <ErrorState error={summary.error} onRetry={() => summary.refetch()} />
-      ) : (
-        <KpiRow summary={summary.data} isLoading={summary.isPending} />
-      )}
+      <Section index="01" label={`Closest flyby · next ${WINDOW_DAYS} days`} className="mt-10 border-t-0 md:mt-14">
+        {approaches.isPending ? (
+          <ClosestFlybySkeleton />
+        ) : approaches.isError ? (
+          <ErrorState error={approaches.error} onRetry={() => approaches.refetch()} />
+        ) : (
+          <ClosestFlyby approach={closest} all={approaches.data} windowDays={WINDOW_DAYS} />
+        )}
+      </Section>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-3">
-        <SectionCard
-          className="xl:col-span-2"
-          title="Upcoming close approaches"
-          description="Next 60 days, within 0.05 AU of Earth"
-          action={<ViewAll to="/close-approaches" />}
+      <div className="mt-14">
+        {summary.isError ? (
+          <ErrorState error={summary.error} onRetry={() => summary.refetch()} />
+        ) : (
+          <SummaryReadouts summary={summary.data} isLoading={summary.isPending} />
+        )}
+      </div>
+
+      <Section
+        index="02"
+        label="Close approaches"
+        title="Upcoming flybys"
+        note={`Every approach within 0.05 AU in the next ${WINDOW_DAYS} days. The closest is marked.`}
+        action={<TextLink to="/close-approaches">All approaches</TextLink>}
+        className="mt-20"
+      >
+        {approaches.isPending ? (
+          <LoadingChart />
+        ) : approaches.isError ? null : (
+          <ApproachTimelineChart
+            data={approaches.data}
+            highlightKey={closest ? approachKey(closest) : undefined}
+            isFetching={approaches.isFetching}
+          />
+        )}
+      </Section>
+
+      <div className="mt-20 grid gap-x-12 gap-y-20 xl:grid-cols-2">
+        <Section
+          index="03"
+          label="Impact risk"
+          title="Highest Palermo scale"
+          action={<TextLink to="/risk">Risk table</TextLink>}
         >
-          {approaches.isPending ? (
-            <LoadingChart />
-          ) : approaches.isError ? (
-            <ErrorState error={approaches.error} onRetry={() => approaches.refetch()} />
-          ) : (
-            <ApproachTimelineChart data={approaches.data} isFetching={approaches.isFetching} />
-          )}
-        </SectionCard>
-
-        <SectionCard title="Highest impact risk" description="Ranked by Palermo scale" action={<ViewAll to="/risk" />}>
           {risk.isPending ? (
             <LoadingRows rows={5} />
           ) : risk.isError ? (
@@ -76,27 +82,22 @@ export default function DashboardPage() {
           ) : (
             <TopRiskList items={risk.data.slice(0, 5)} />
           )}
-        </SectionCard>
-      </div>
+        </Section>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-3">
-        <SectionCard
-          className="xl:col-span-3"
-          title="Recent fireballs"
-          description="Bolides detected by US Government sensors"
-          action={<ViewAll to="/fireballs" />}
+        <Section
+          index="04"
+          label="Fireballs"
+          title="Recent atmospheric impacts"
+          action={<TextLink to="/fireballs">All events</TextLink>}
         >
           {fireballs.isPending ? (
             <LoadingRows rows={5} />
           ) : fireballs.isError ? (
             <ErrorState error={fireballs.error} onRetry={() => fireballs.refetch()} />
           ) : (
-            <div className="grid gap-x-8 md:grid-cols-2">
-              <LatestFireballs items={fireballs.data.slice(0, 4)} />
-              <LatestFireballs items={fireballs.data.slice(4, 8)} />
-            </div>
+            <LatestFireballs items={fireballs.data.slice(0, 5)} />
           )}
-        </SectionCard>
+        </Section>
       </div>
     </>
   )

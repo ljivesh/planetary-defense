@@ -97,6 +97,13 @@ export function meanMotion(el: Elements): number {
   return el.meanMotionDegPerDay ?? K_DEG_PER_DAY / Math.pow(el.a, 1.5)
 }
 
+/** Heliocentric position (AU) at true anomaly ν (degrees): ν = 0 is perihelion. */
+export function positionAtTrueAnomaly(el: Elements, nuDeg: number): Vec3 {
+  const nu = rad(nuDeg)
+  const r = (el.a * (1 - el.e * el.e)) / (1 + el.e * Math.cos(nu))
+  return toEcliptic(el, r * Math.cos(nu), r * Math.sin(nu))
+}
+
 /** Heliocentric position (AU) at Julian Date `jd`. Only valid for elliptical orbits. */
 export function positionAt(el: Elements, jd: number): Vec3 {
   const M = rad(el.m + meanMotion(el) * (jd - el.epoch))

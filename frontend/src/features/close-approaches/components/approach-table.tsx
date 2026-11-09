@@ -18,12 +18,12 @@ const col = createDataTableColumnHelper<CloseApproach>()
 
 const columns = col.columns([
   col.accessor('time', {
-    header: 'Closest approach',
+    header: 'Closest approach (UTC)',
     sortFn: 'datetime',
     cell: (info) => (
       <div className="leading-tight">
-        <div className="num">{formatDateTime(info.getValue())}</div>
-        <div className="text-xs text-muted-foreground">{formatRelative(info.getValue())}</div>
+        <div className="figure">{formatDateTime(info.getValue())}</div>
+        <div className="micro mt-0.5 text-muted-ink">{formatRelative(info.getValue())}</div>
       </div>
     ),
   }),
@@ -33,12 +33,12 @@ const columns = col.columns([
     cell: (info) => <ObjectLink designation={info.row.original.designation} name={info.getValue()} />,
   }),
   col.accessor('distanceAu', {
-    header: 'Miss distance',
+    header: 'Miss dist.',
     meta: { align: 'end' },
     cell: (info) => (
       <div className="leading-tight">
-        <div>{formatLd(info.getValue())}</div>
-        <div className="text-xs text-muted-foreground">{formatKm(info.getValue())}</div>
+        <div className="text-ink">{formatLd(info.getValue())}</div>
+        <div className="mt-0.5 text-[11px] text-muted-ink">{formatKm(info.getValue())}</div>
       </div>
     ),
   }),

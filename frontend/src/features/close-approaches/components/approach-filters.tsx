@@ -1,7 +1,4 @@
-import { RotateCcw } from 'lucide-react'
-
 import { FilterSelect } from '@/components/common/filter-select'
-import { Button } from '@/components/ui/button'
 import {
   APPROACH_FILTER_DEFAULTS,
   DISTANCE_OPTIONS,
@@ -22,32 +19,32 @@ export function ApproachFiltersBar({ value, onChange, onReset }: ApproachFilters
     (k) => value[k] === APPROACH_FILTER_DEFAULTS[k],
   )
   return (
-    <div className="flex flex-wrap items-end gap-3">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-hairline py-3">
       <FilterSelect
         id="filter-window"
-        label="Time window"
+        label="Window"
         value={value.window}
         options={WINDOW_OPTIONS}
         onChange={(window) => onChange({ window })}
       />
       <FilterSelect
         id="filter-distance"
-        label="Miss distance"
+        label="Distance"
         value={value.dist}
         options={DISTANCE_OPTIONS}
         onChange={(dist) => onChange({ dist })}
       />
       <FilterSelect
         id="filter-size"
-        label="Estimated size"
+        label="Size"
         value={value.minSize}
         options={SIZE_OPTIONS}
         onChange={(minSize) => onChange({ minSize })}
       />
       {!isDefault && (
-        <Button variant="ghost" size="sm" onClick={onReset}>
-          <RotateCcw /> Reset
-        </Button>
+        <button type="button" onClick={onReset} className="eyebrow ml-auto text-body hover:text-signal">
+          Reset ×
+        </button>
       )}
     </div>
   )

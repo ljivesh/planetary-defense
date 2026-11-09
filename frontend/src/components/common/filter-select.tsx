@@ -1,4 +1,3 @@
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export interface FilterOption {
@@ -14,20 +13,24 @@ interface FilterSelectProps {
   onChange: (value: string) => void
 }
 
-/** Labelled dropdown used in filter rows. */
+/** Compact inline filter: mono label, then a borderless select. */
 export function FilterSelect({ id, label, value, options, onChange }: FilterSelectProps) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id} className="text-xs text-muted-foreground">
+    <div className="flex items-center gap-2">
+      <label htmlFor={id} className="eyebrow">
         {label}
-      </Label>
+      </label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id} className="w-40">
+        <SelectTrigger
+          id={id}
+          size="sm"
+          className="h-7 gap-1.5 border-hairline-strong bg-transparent px-2 text-xs text-ink shadow-none dark:bg-transparent"
+        >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="rounded-[2px] border-hairline-strong bg-canvas shadow-none">
           {options.map((o) => (
-            <SelectItem key={o.value} value={o.value}>
+            <SelectItem key={o.value} value={o.value} className="text-xs">
               {o.label}
             </SelectItem>
           ))}

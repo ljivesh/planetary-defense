@@ -1,33 +1,94 @@
 import { useMemo } from 'react'
 
-import { toElements, toScene } from '@/features/orbit/lib'
+import type { CloseApproach } from '@/features/close-approaches/schemas'
 import type { OrbitalElements } from '@/features/objects/schemas'
-import { EARTH_ELEMENTS, distance, isElliptical, orbitPath, positionAt, type Vec3 } from '@/lib/orbital'
+import {
+  apsides,
+  dropLines,
+  nodePositions,
+  splitAtEcliptic,
+  toElements,
+  toScene,
+  trailPath,
+} from '@/features/orbit/lib'
+import { planetsFor } from '@/features/orbit/planets'
+import { EARTH_ELEMENTS, dateToJd, distance, isElliptical, orbitPath, positionAt, type Vec3 } from '@/lib/orbital'
 
-/** Orbit paths (static) and body positions (per Julian Date) in scene coordinates. */
-export function useOrbitModel(objectElements: OrbitalElements, jd: number) {
+const toSceneAll = (pts: Vec3[]) => pts.map(toScene)
+
+export interface Encounter {
+  approach: CloseApproach
+  jd: number
+  earth: Vec3
+  object: Vec3
+}
+
+/**
+ * Everything the orbit scene draws, in scene coordinates. Static geometry
+ * (paths, markers) depends only on the elements; positions depend on `jd`.
+ */
+export function useOrbitModel(objectElements: OrbitalElements, jd: number, encounterApproach: CloseApproach | null) {
   const el = useMemo(() => toElements(objectElements), [objectElements])
   const elliptical = isElliptical(el)
+  const aphelion = elliptical ? (objectElements.ad ?? el.a * (1 + el.e)) : el.a
 
-  const paths = useMemo(
-    () => ({
-      earth: orbitPath(EARTH_ELEMENTS, 256).map(toScene),
-      object: orbitPath(el, 512).map(toScene),
-    }),
-    [el],
+  const planets = useMemo(
+    () => planetsFor(aphelion).map((p) => ({ ...p, path: toSceneAll(orbitPath(p.elements, 256)) })),
+    [aphelion],
   )
 
-  return useMemo(() => {
+  const geometry = useMemo(() => {
+    if (!elliptical) return null
+    const path = orbitPath(el, 720)
+    const { above, below } = splitAtEcliptic(path)
+    const nodes = nodePositions(el)
+    const aps = apsides(el)
+    return {
+      above: above.map(toSceneAll),
+      below: below.map(toSceneAll),
+      drops: toSceneAll(dropLines(path, 20)),
+      ascending: toScene(nodes.ascending),
+      descending: toScene(nodes.descending),
+      perihelion: toScene(aps.perihelion),
+      aphelion: toScene(aps.aphelion),
+    }
+  }, [el, elliptical])
+
+  const encounter = useMemo<Encounter | null>(() => {
+    if (!elliptical || !encounterApproach) return null
+    const ejd = dateToJd(new Date(encounterApproach.time))
+    return {
+      approach: encounterApproach,
+      jd: ejd,
+      earth: toScene(positionAt(EARTH_ELEMENTS, ejd)),
+      object: toScene(positionAt(el, ejd)),
+    }
+  }, [el, elliptical, encounterApproach])
+
+  const live = useMemo(() => {
     const earthAu = positionAt(EARTH_ELEMENTS, jd)
     const objectAu: Vec3 | null = elliptical ? positionAt(el, jd) : null
     return {
-      paths,
-      elliptical,
-      earth: toScene(earthAu),
+      planets: planets.map((p) => ({ id: p.id, position: toScene(positionAt(p.elements, jd)) })),
       object: objectAu ? toScene(objectAu) : null,
+      trail: elliptical ? toSceneAll(trailPath(el, jd)) : [],
       earthDistanceAu: objectAu ? distance(earthAu, objectAu) : null,
-      /** Radius (scene units) the camera should frame. */
-      extent: Math.max(1.2, elliptical ? (objectElements.ad ?? objectElements.a) : 1.2),
+      sunDistanceAu: objectAu ? distance(objectAu, [0, 0, 0]) : null,
+      /** Above (+) or below (−) the ecliptic, AU. */
+      eclipticHeightAu: objectAu ? objectAu[2] : null,
     }
-  }, [paths, elliptical, el, jd, objectElements.ad, objectElements.a])
+  }, [planets, elliptical, el, jd])
+
+  return {
+    elliptical,
+    elements: el,
+    planets,
+    geometry,
+    encounter,
+    live,
+    /** Radius (AU) the camera and reference rings should frame. */
+    extentAu: Math.max(1.6, elliptical ? aphelion : 1.6),
+  }
 }
+
+export type OrbitModel = ReturnType<typeof useOrbitModel>

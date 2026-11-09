@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  formatCountdown,
+  formatDate,
+  formatDateTime,
   auToLd,
   formatDiameter,
   formatEnergyKt,
@@ -36,5 +39,15 @@ describe('format helpers', () => {
 
   it('formats ISO dates in UTC', () => {
     expect(toIsoDate(new Date('2026-11-07T23:59:00Z'))).toBe('2026-11-07')
+    // Late-evening UTC must not roll over into the local timezone's next day.
+    expect(formatDate('2026-11-07T23:59:00Z')).toBe('Nov 7, 2026')
+    expect(formatDateTime('2026-11-08T21:34:00Z')).toBe('Nov 8, 2026 21:34 UTC')
+  })
+
+  it('formats mission-clock countdowns', () => {
+    const now = Date.parse('2026-11-07T05:12:00Z')
+    expect(formatCountdown('2026-11-08T21:34:05Z', now)).toBe('T− 1d 16:22:05')
+    expect(formatCountdown('2026-11-07T05:13:30Z', now)).toBe('T− 00:01:30')
+    expect(formatCountdown('2026-11-07T04:12:00Z', now)).toBe('T+ 01:00:00')
   })
 })

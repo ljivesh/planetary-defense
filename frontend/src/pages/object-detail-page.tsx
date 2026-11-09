@@ -1,10 +1,10 @@
-import { SearchX } from 'lucide-react'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 import { EmptyState } from '@/components/common/empty-state'
 import { ErrorState } from '@/components/common/error-state'
 import { LoadingChart } from '@/components/common/loading-block'
-import { Button } from '@/components/ui/button'
+import { Section } from '@/components/common/section'
+import { TextLink } from '@/components/common/text-link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApproachHistoryCard } from '@/features/objects/components/approach-history-card'
 import { ObjectHeader } from '@/features/objects/components/object-header'
@@ -21,9 +21,10 @@ export default function ObjectDetailPage() {
 
   if (isPending) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-72" />
-        <LoadingChart className="h-[420px]" />
+      <div className="pt-14" aria-busy="true">
+        <Skeleton className="h-3 w-48" />
+        <Skeleton className="mt-5 h-14 w-80 max-w-full" />
+        <LoadingChart className="mt-12 h-[600px]" />
       </div>
     )
   }
@@ -32,38 +33,37 @@ export default function ObjectDetailPage() {
     const notFound = error instanceof ApiError && (error.isNotFound || error.status === 400)
     return notFound ? (
       <EmptyState
-        icon={SearchX}
-        title={`No object matches “${designation}”`}
+        label="Not found"
+        title={`No object matches “${designation}”.`}
         description={
           error.message === 'object not found'
             ? 'Try a number (99942), a name (Apophis) or a provisional designation (2004 MN4).'
             : error.message
         }
-        action={
-          <Button variant="outline" asChild>
-            <Link to="/risk">Browse the risk table</Link>
-          </Button>
-        }
-        className="py-20"
+        action={<TextLink to="/risk">Browse the risk table</TextLink>}
+        className="py-24"
       />
     ) : (
-      <ErrorState error={error} onRetry={() => refetch()} />
+      <ErrorState error={error} onRetry={() => refetch()} className="mt-14" />
     )
   }
 
   return (
     <>
       <ObjectHeader object={data} />
-      <div className="grid gap-6 xl:grid-cols-5">
-        <div className="space-y-6 xl:col-span-3">
-          <OrbitViewer object={data} />
-          <OrbitElementsCard object={data} />
-        </div>
-        <div className="space-y-6 xl:col-span-2">
-          <RiskAssessmentCard risk={data.risk} />
-          <PhysicalCard object={data} />
-          <ApproachHistoryCard designation={data.designation} />
-        </div>
+
+      <Section index="01" label="Orbit" note="Heliocentric, two-body approximation. Planets use mean J2000 elements.">
+        <OrbitViewer key={data.designation} object={data} />
+      </Section>
+
+      <div className="mt-20 grid gap-x-12 gap-y-20 lg:grid-cols-2">
+        <OrbitElementsCard object={data} index="02" />
+        <PhysicalCard object={data} index="03" />
+      </div>
+
+      <div className="mt-20 grid gap-x-12 gap-y-20 lg:grid-cols-2">
+        <RiskAssessmentCard risk={data.risk} index="04" />
+        <ApproachHistoryCard designation={data.designation} index="05" />
       </div>
     </>
   )

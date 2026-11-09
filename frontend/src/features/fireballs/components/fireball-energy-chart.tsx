@@ -13,6 +13,7 @@ import {
 } from 'recharts'
 
 import { ChartTooltip } from '@/components/common/chart-tooltip'
+import { AXIS_TICK, CHART_LABEL, decadeTicks, yearTicks } from '@/components/common/chart-theme'
 import { formatLocation, HIROSHIMA_KT } from '@/features/fireballs/lib'
 import type { Fireball } from '@/features/fireballs/schemas'
 import { formatDateTime, formatEnergyKt, formatVelocity } from '@/lib/format'
@@ -23,66 +24,71 @@ interface Point {
   item: Fireball
 }
 
-const AXIS_TICK = { fill: 'var(--muted-foreground)', fontSize: 11 }
-
-/** Impact energy of each fireball over time (log scale – energies span 4+ orders of magnitude). */
-export function FireballEnergyChart({ data, height = 280 }: { data: Fireball[]; height?: number }) {
-  const points = useMemo<Point[]>(
-    () =>
-      data
-        .filter((f) => f.impactEnergyKt > 0)
-        .map((item) => ({ t: new Date(item.time).getTime(), kt: item.impactEnergyKt, item })),
-    [data],
-  )
+/** Impact energy of each fireball over time (log scale: energies span 4+ orders of magnitude). */
+export function FireballEnergyChart({ data, height = 300 }: { data: Fireball[]; height?: number }) {
+  const { points, xTicks, yTicks, yDomain } = useMemo(() => {
+    const pts = data
+      .filter((f) => f.impactEnergyKt > 0)
+      .map<Point>((item) => ({ t: new Date(item.time).getTime(), kt: item.impactEnergyKt, item }))
+    const kts = pts.map((p) => p.kt)
+    const decades = kts.length ? decadeTicks(Math.min(...kts), Math.max(...kts)) : []
+    return {
+      points: pts,
+      xTicks: yearTicks(pts.map((p) => p.t)),
+      yTicks: decades,
+      yDomain: decades.length ? [decades[0], decades[decades.length - 1]] : (['auto', 'auto'] as const),
+    }
+  }, [data])
 
   return (
     <figure>
       <ResponsiveContainer width="100%" height={height}>
-        <ScatterChart margin={{ top: 8, right: 72, bottom: 4, left: 0 }}>
-          <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
+        <ScatterChart margin={{ top: 16, right: 8, bottom: 0, left: 0 }}>
+          <CartesianGrid vertical={false} stroke="var(--hairline)" />
           <XAxis
             dataKey="t"
             type="number"
             scale="time"
             domain={['dataMin', 'dataMax']}
-            tickFormatter={(t: number) => format(t, 'MMM yyyy')}
+            ticks={xTicks}
+            tickFormatter={(t: number) => format(t, 'yyyy')}
             tick={AXIS_TICK}
-            stroke="var(--chart-axis)"
+            stroke="var(--hairline-strong)"
             tickLine={false}
+            tickMargin={8}
           />
           <YAxis
             dataKey="kt"
             type="number"
             scale="log"
-            domain={['auto', 'auto']}
-            allowDataOverflow
+            domain={yDomain}
+            ticks={yTicks}
+            tickFormatter={(v: number) => (v >= 1 ? v.toLocaleString('en-US') : String(v))}
             tick={AXIS_TICK}
-            stroke="var(--chart-axis)"
             tickLine={false}
             axisLine={false}
-            width={48}
-            tickFormatter={(v: number) => (v >= 1 ? `${v}` : v.toString())}
-            label={{ value: 'kt', position: 'insideTopLeft', offset: 0, fill: 'var(--muted-foreground)', fontSize: 11 }}
+            width={52}
           />
           <ReferenceLine
             y={HIROSHIMA_KT}
-            stroke="var(--muted-foreground)"
-            strokeOpacity={0.5}
-            label={{ value: 'Hiroshima', position: 'right', fill: 'var(--muted-foreground)', fontSize: 11 }}
+            stroke="var(--muted-ink)"
+            strokeDasharray="3 3"
+            label={{ ...CHART_LABEL, value: `HIROSHIMA · ${HIROSHIMA_KT} KT`, position: 'insideTopRight' }}
           />
           <Tooltip cursor={false} content={renderTooltip} />
           <Scatter
             data={points}
-            fill="var(--chart-2)"
-            fillOpacity={0.85}
-            stroke="var(--card)"
+            fill="var(--chart-neutral)"
+            fillOpacity={0.75}
+            stroke="var(--canvas)"
             strokeWidth={2}
             isAnimationActive={false}
           />
         </ScatterChart>
       </ResponsiveContainer>
-      <figcaption className="mt-2 text-xs text-muted-foreground">
-        Impact energy of {points.length} fireball events over time · Hiroshima ≈ {HIROSHIMA_KT} kt for scale
+      <figcaption className="mt-3 text-xs text-muted-ink">
+        Impact energy of {points.length} fireball events, log scale. The Hiroshima bomb (≈ {HIROSHIMA_KT} kt) is marked
+        for scale.
       </figcaption>
     </figure>
   )
@@ -95,7 +101,7 @@ function renderTooltip({ active, payload }: TooltipContentProps) {
     <ChartTooltip
       title={formatDateTime(p.item.time)}
       rows={[
-        { label: 'Impact energy', value: formatEnergyKt(p.kt) },
+        { label: 'Energy', value: formatEnergyKt(p.kt) },
         { label: 'Location', value: formatLocation(p.item) },
         { label: 'Velocity', value: formatVelocity(p.item.velocityKms) },
       ]}

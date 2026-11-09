@@ -14,12 +14,13 @@ export function palermoLevel(ps: number): StatusLevel {
   return 'good'
 }
 
+/** Short state word for a Palermo value (rendered as mono caps). */
 export function palermoLabel(ps: number): string {
   switch (palermoLevel(ps)) {
     case 'critical':
-      return 'Above background'
+      return 'Concern'
     case 'serious':
-      return 'Merits monitoring'
+      return 'Monitor'
     case 'warning':
       return 'Low'
     default:

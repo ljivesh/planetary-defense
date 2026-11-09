@@ -1,7 +1,6 @@
 import { useTable, type ColumnDef, type RowData, type SortingState } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { dataTableFeatures, type DataTableFeatures } from '@/components/common/data-table/features'
 import { cn } from '@/lib/utils'
@@ -21,7 +20,10 @@ interface DataTableProps<TData extends RowData> {
   className?: string
 }
 
-/** Sortable, paginated table built on TanStack Table v9 and shadcn/ui primitives. */
+/**
+ * Sortable, paginated data-sheet table (TanStack Table v9): no outer frame, mono
+ * caps headers, hairline rows, mono right-aligned figures.
+ */
 export function DataTable<TData extends RowData>({
   columns,
   data,
@@ -47,11 +49,11 @@ export function DataTable<TData extends RowData>({
 
   return (
     <div className={cn('transition-opacity', isFetching && 'opacity-60', className)}>
-      <div className="overflow-x-auto rounded-lg border">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((group) => (
-              <TableRow key={group.id} className="hover:bg-transparent">
+              <TableRow key={group.id} className="border-hairline-strong hover:bg-transparent">
                 {group.headers.map((header) => {
                   const meta = header.column.columnDef.meta
                   const sorted = header.column.getIsSorted()
@@ -61,7 +63,7 @@ export function DataTable<TData extends RowData>({
                       key={header.id}
                       aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined}
                       className={cn(
-                        'text-xs font-medium tracking-wide text-muted-foreground uppercase',
+                        'eyebrow h-9 px-3 first:pl-0 last:pr-0',
                         meta?.align === 'end' && 'text-right',
                         meta?.hideOnMobile && 'hidden md:table-cell',
                       )}
@@ -71,7 +73,8 @@ export function DataTable<TData extends RowData>({
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
                           className={cn(
-                            'inline-flex items-center gap-1 hover:text-foreground',
+                            'inline-flex items-center gap-1 uppercase hover:text-ink',
+                            sorted && 'text-ink',
                             meta?.align === 'end' && 'flex-row-reverse',
                           )}
                         >
@@ -80,9 +83,7 @@ export function DataTable<TData extends RowData>({
                             <ArrowUp className="size-3" />
                           ) : sorted === 'desc' ? (
                             <ArrowDown className="size-3" />
-                          ) : (
-                            <ArrowUpDown className="size-3 opacity-40" />
-                          )}
+                          ) : null}
                         </button>
                       ) : (
                         <table.FlexRender header={header} />
@@ -96,7 +97,7 @@ export function DataTable<TData extends RowData>({
           <TableBody>
             {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={columns.length} className="h-24 px-0 text-body">
                   {emptyMessage}
                 </TableCell>
               </TableRow>
@@ -113,7 +114,10 @@ export function DataTable<TData extends RowData>({
                         }
                       : undefined
                   }
-                  className={cn(onRowClick && 'cursor-pointer outline-none focus-visible:bg-muted/60')}
+                  className={cn(
+                    'border-hairline hover:bg-surface',
+                    onRowClick && 'cursor-pointer outline-none focus-visible:bg-surface',
+                  )}
                 >
                   {row.getAllCells().map((cell) => {
                     const meta = cell.column.columnDef.meta
@@ -121,7 +125,8 @@ export function DataTable<TData extends RowData>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          meta?.align === 'end' && 'text-right num',
+                          'h-11 px-3 text-[13px] first:pl-0 last:pr-0',
+                          meta?.align === 'end' && 'text-right figure',
                           meta?.hideOnMobile && 'hidden md:table-cell',
                         )}
                       >
@@ -137,29 +142,31 @@ export function DataTable<TData extends RowData>({
       </div>
 
       {pageCount > 1 && (
-        <div className="flex items-center justify-between gap-2 pt-3 text-sm text-muted-foreground">
-          <span className="num">
-            {data.length.toLocaleString()} rows · page {pageIndex + 1} of {pageCount}
+        <div className="flex items-center justify-between gap-4 border-t border-hairline pt-3">
+          <span className="eyebrow">
+            {(pageIndex * pageSize + 1).toLocaleString()}–
+            {Math.min((pageIndex + 1) * pageSize, data.length).toLocaleString()} of {data.length.toLocaleString()}
           </span>
-          <div className="flex gap-1">
-            <Button
-              variant="outline"
-              size="icon-sm"
-              aria-label="Previous page"
+          <div className="flex gap-4">
+            <button
+              type="button"
+              className="eyebrow text-body hover:text-ink disabled:opacity-30"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronLeft />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              aria-label="Next page"
+              ← Prev
+            </button>
+            <span className="eyebrow text-ink">
+              {pageIndex + 1} / {pageCount}
+            </span>
+            <button
+              type="button"
+              className="eyebrow text-body hover:text-ink disabled:opacity-30"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <ChevronRight />
-            </Button>
+              Next →
+            </button>
           </div>
         </div>
       )}

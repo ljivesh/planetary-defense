@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router'
 
 import { createDataTableColumnHelper, DataTable } from '@/components/common/data-table'
 import { ObjectLink } from '@/features/close-approaches/components/object-link'
-import { PalermoBadge, TorinoBadge } from '@/features/risk/components/hazard-badges'
+import { PalermoMark, TorinoMark } from '@/features/risk/components/risk-marks'
 import type { RiskObject } from '@/features/risk/schemas'
 import { formatDiameter, formatNumber, formatOdds, formatVelocity, representativeDiameterM } from '@/lib/format'
 
@@ -15,13 +15,13 @@ const columns = col.columns([
     cell: (info) => <ObjectLink designation={info.row.original.designation} name={info.getValue()} />,
   }),
   col.accessor('palermoCumulative', {
-    header: 'Palermo (cum.)',
-    cell: (info) => <PalermoBadge value={info.getValue()} />,
+    header: 'Palermo',
+    cell: (info) => <PalermoMark value={info.getValue()} />,
   }),
   col.accessor('torinoMax', {
     header: 'Torino',
     meta: { hideOnMobile: true },
-    cell: (info) => <TorinoBadge value={info.getValue()} />,
+    cell: (info) => <TorinoMark value={info.getValue()} />,
   }),
   col.accessor('impactProbability', {
     header: 'Impact odds',
@@ -34,7 +34,7 @@ const columns = col.columns([
     sortFn: 'alphanumeric',
   }),
   col.accessor('impactCount', {
-    header: 'Potential impacts',
+    header: 'VIs',
     meta: { align: 'end', hideOnMobile: true },
     cell: (info) => formatNumber(info.getValue(), 0),
   }),

@@ -1,20 +1,26 @@
 import { Link } from 'react-router'
 
+import { displayName } from '@/lib/format'
+import { cn } from '@/lib/utils'
+
 interface ObjectLinkProps {
   designation: string
   name?: string
+  className?: string
 }
 
-/** Link to an object's profile page; strips JPL's parentheses from provisional names. */
-export function ObjectLink({ designation, name }: ObjectLinkProps) {
-  const label = (name ?? designation).replace(/^\((.*)\)$/, '$1')
+/** Link to an object's profile page. */
+export function ObjectLink({ designation, name, className }: ObjectLinkProps) {
   return (
     <Link
       to={`/objects/${encodeURIComponent(designation)}`}
       onClick={(e) => e.stopPropagation()}
-      className="font-medium text-foreground underline-offset-4 hover:underline"
+      className={cn(
+        'text-ink decoration-hairline-strong underline-offset-4 hover:text-signal hover:underline',
+        className,
+      )}
     >
-      {label}
+      {displayName(name ?? designation)}
     </Link>
   )
 }

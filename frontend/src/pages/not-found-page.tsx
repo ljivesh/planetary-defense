@@ -1,20 +1,13 @@
-import { Telescope } from 'lucide-react'
-import { Link } from 'react-router'
-
 import { EmptyState } from '@/components/common/empty-state'
-import { Button } from '@/components/ui/button'
+import { TextLink } from '@/components/common/text-link'
 
 export default function NotFoundPage() {
   return (
     <EmptyState
-      icon={Telescope}
-      title="Lost in space"
-      description="We couldn't find that page."
-      action={
-        <Button asChild variant="outline">
-          <Link to="/">Back to overview</Link>
-        </Button>
-      }
+      label="404"
+      title="Nothing at these coordinates."
+      description="The page you asked for doesn't exist."
+      action={<TextLink to="/">Back to overview</TextLink>}
       className="py-24"
     />
   )

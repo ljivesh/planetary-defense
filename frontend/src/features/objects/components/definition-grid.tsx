@@ -1,23 +1,29 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '@/lib/utils'
-
 export interface DefinitionItem {
   label: string
+  /** Optional symbol shown after the label (e.g. "a", "Ω"). */
+  symbol?: string
   value: ReactNode
+  /** Muted trailing figure: uncertainty, alternate unit. */
+  sub?: ReactNode
   hint?: string
 }
 
-/** Two-column label/value grid for parameter cards. */
-export function DefinitionGrid({ items, columns = 2 }: { items: DefinitionItem[]; columns?: 1 | 2 }) {
+/** Data-sheet definition list: label left, mono figure right, hairline rows. */
+export function DefinitionGrid({ items }: { items: DefinitionItem[] }) {
   return (
-    <dl className={cn('grid grid-cols-1 gap-x-6 gap-y-3', columns === 2 && 'sm:grid-cols-2')}>
+    <dl className="border-t border-hairline">
       {items.map((item) => (
-        <div key={item.label} className="flex items-baseline justify-between gap-3 border-b pb-2 last:border-0">
-          <dt className="text-sm text-muted-foreground" title={item.hint}>
+        <div key={item.label} className="flex items-baseline justify-between gap-4 border-b border-hairline py-2.5">
+          <dt className="text-[13px] text-body" title={item.hint}>
             {item.label}
+            {item.symbol && <span className="ml-2 figure text-xs text-muted-ink">{item.symbol}</span>}
           </dt>
-          <dd className="text-right text-sm font-medium num">{item.value}</dd>
+          <dd className="min-w-0 text-right figure text-[13px] text-ink">
+            {item.value}
+            {item.sub && <span className="ml-2 text-muted-ink">{item.sub}</span>}
+          </dd>
         </div>
       ))}
     </dl>

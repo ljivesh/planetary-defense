@@ -1,25 +1,21 @@
-import { ShieldCheck } from 'lucide-react'
-
-import { EmptyState } from '@/components/common/empty-state'
-import { SectionCard } from '@/components/common/section-card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { PlainTable, Td, Th } from '@/components/common/plain-table'
+import { Section } from '@/components/common/section'
 import { DefinitionGrid } from '@/features/objects/components/definition-grid'
 import type { RiskAssessment } from '@/features/objects/schemas'
-import { PalermoBadge, TorinoBadge } from '@/features/risk/components/hazard-badges'
+import { PalermoMark, TorinoMark } from '@/features/risk/components/risk-marks'
 import { formatCompact, formatNumber, formatOdds, formatProbability, formatSigned, formatVelocity } from '@/lib/format'
 
 const MAX_IMPACTORS = 10
 
-export function RiskAssessmentCard({ risk }: { risk: RiskAssessment | null }) {
+export function RiskAssessmentCard({ risk, index }: { risk: RiskAssessment | null; index: string }) {
   if (!risk) {
     return (
-      <SectionCard title="Impact risk" description="NASA/JPL Sentry assessment">
-        <EmptyState
-          icon={ShieldCheck}
-          title="Not on the Sentry risk list"
-          description="No potential Earth impacts have been found for this object in the next 100+ years."
-        />
-      </SectionCard>
+      <Section index={index} label="Impact risk · Sentry">
+        <p className="text-base text-ink">Not on the Sentry risk list.</p>
+        <p className="mt-1 max-w-lg text-sm text-body">
+          No potential Earth impacts have been found for this object over the next century or more.
+        </p>
+      </Section>
     )
   }
 
@@ -28,13 +24,12 @@ export function RiskAssessmentCard({ risk }: { risk: RiskAssessment | null }) {
     .slice(0, MAX_IMPACTORS)
 
   return (
-    <SectionCard title="Impact risk" description={`NASA/JPL Sentry assessment · computed ${risk.computedAt}`}>
-      <div className="mb-4 flex flex-wrap gap-2">
-        <PalermoBadge value={risk.palermoCumulative} />
-        <TorinoBadge value={risk.torinoMax} />
+    <Section index={index} label="Impact risk · Sentry" note={`Computed ${risk.computedAt}.`}>
+      <div className="mb-6 flex flex-wrap gap-x-8 gap-y-2">
+        <PalermoMark value={risk.palermoCumulative} />
+        <TorinoMark value={risk.torinoMax} />
       </div>
       <DefinitionGrid
-        columns={1}
         items={[
           { label: 'Cumulative impact odds', value: formatOdds(risk.impactProbability) },
           { label: 'Potential impacts', value: formatNumber(risk.impactCount, 0) },
@@ -45,34 +40,36 @@ export function RiskAssessmentCard({ risk }: { risk: RiskAssessment | null }) {
         ]}
       />
       {impactors.length > 0 && (
-        <div className="mt-5">
-          <h3 className="mb-2 text-sm font-medium">
-            Top virtual impactors{risk.impactors.length > MAX_IMPACTORS && ` (of ${risk.impactors.length})`}
-          </h3>
-          <div className="overflow-x-auto rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Probability</TableHead>
-                  <TableHead className="text-right">Palermo</TableHead>
-                  <TableHead className="text-right">Torino</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {impactors.map((vi) => (
-                  <TableRow key={vi.date}>
-                    <TableCell className="num">{vi.date}</TableCell>
-                    <TableCell className="text-right num">{formatProbability(vi.impactProbability)}</TableCell>
-                    <TableCell className="text-right num">{formatSigned(vi.palermo)}</TableCell>
-                    <TableCell className="text-right num">{vi.torino ?? '—'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+        <div className="mt-8">
+          <p className="eyebrow mb-2">
+            Top virtual impactors{risk.impactors.length > MAX_IMPACTORS && ` · ${risk.impactors.length} total`}
+          </p>
+          <PlainTable>
+            <thead>
+              <tr>
+                <Th>Date</Th>
+                <Th numeric>Probability</Th>
+                <Th numeric>Palermo</Th>
+                <Th numeric>Torino</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {impactors.map((vi) => (
+                <tr key={vi.date}>
+                  <Td className="figure text-ink">{vi.date}</Td>
+                  <Td numeric>{formatProbability(vi.impactProbability)}</Td>
+                  <Td numeric className="text-body">
+                    {formatSigned(vi.palermo)}
+                  </Td>
+                  <Td numeric className="text-body">
+                    {vi.torino ?? '—'}
+                  </Td>
+                </tr>
+              ))}
+            </tbody>
+          </PlainTable>
         </div>
       )}
-    </SectionCard>
+    </Section>
   )
 }
