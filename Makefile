@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 GOLANGCI := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
-.PHONY: help install dev dev-api dev-web build build-api build-web test test-api test-web lint lint-api lint-web fmt
+.PHONY: help install dev dev-api dev-web build build-api build-web test test-api test-web test-e2e lint lint-api lint-web fmt
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -34,6 +34,9 @@ test-api: ## Run Go tests with the race detector
 
 test-web: ## Run Vitest
 	cd frontend && pnpm test
+
+test-e2e: ## Run Playwright end-to-end tests (starts fake JPL, API and web on their own ports)
+	cd frontend && pnpm test:e2e
 
 lint: lint-api lint-web ## Lint everything
 
