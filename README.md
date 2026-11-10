@@ -12,11 +12,21 @@ viewer, and fireball (bolide) events.
 
 **Live demo:** https://planetary-defense.menma.me
 
-![Overview: the closest flyby in the next 60 days, a miss-distance strip and 30-day KPIs](docs/screenshots/overview.png)
+[![Overview: the closest flyby in the next 60 days, a miss-distance strip and 30-day KPIs](docs/screenshots/overview.png)](https://planetary-defense.menma.me/)
 
 | 3D orbit viewer (99942 Apophis) | Close approaches, next 60 days |
 |---|---|
-| ![Apophis orbit relative to the inner planets](docs/screenshots/apophis-orbit.png) | ![Timeline of 36 approaches by date and miss distance](docs/screenshots/close-approaches.png) |
+| [![Apophis and the inner planets moving along their orbits](docs/screenshots/apophis-orbit.gif)](https://planetary-defense.menma.me/objects/99942) | [![Close approaches by date and miss distance](docs/screenshots/close-approaches.png)](https://planetary-defense.menma.me/close-approaches) |
+
+| Impact risk (Sentry) | Fireballs |
+|---|---|
+| [![Sentry impact-risk table sorted by Palermo scale](docs/screenshots/risk.png)](https://planetary-defense.menma.me/risk) | [![Fireball impact energies over time](docs/screenshots/fireballs.png)](https://planetary-defense.menma.me/fireballs) |
+
+| Light theme: overview | Light theme: 99942 Apophis |
+|---|---|
+| [![Overview in the light theme](docs/screenshots/overview-light.png)](https://planetary-defense.menma.me/) | [![Apophis object page in the light theme](docs/screenshots/apophis-orbit-light.png)](https://planetary-defense.menma.me/objects/99942) |
+
+Screenshots are from the live site; click any of them to open that page.
 
 - **Frontend:** React 19 · TypeScript 7 · Vite 8 · Tailwind CSS v4 · shadcn/ui (Radix) · TanStack Query & Table · React Router 8 · Recharts · react-three-fiber · zod
 - **Backend:** Go 1.26 · chi · otter (TTL cache with load coalescing) · slog · caarlos0/env
