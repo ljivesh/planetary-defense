@@ -10,6 +10,8 @@ Track near-Earth objects using public NASA/JPL data. The dashboard shows upcomin
 close approaches, the Sentry impact-risk table, object profiles with a 3D orbit
 viewer, and fireball (bolide) events.
 
+**Live demo:** https://planetary-defense.menma.me
+
 ![Overview: the closest flyby in the next 60 days, a miss-distance strip and 30-day KPIs](docs/screenshots/overview.png)
 
 | 3D orbit viewer (99942 Apophis) | Close approaches, next 60 days |
