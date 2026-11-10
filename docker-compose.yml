@@ -1,0 +1,20 @@
+# Production stack: nginx serves the web app and proxies /api to the Go API.
+# Put a TLS-terminating proxy (Traefik, Caddy, a CDN) in front of `web`.
+services:
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      LOG_LEVEL: info
+      # Requests arrive through the edge proxy and then nginx.
+      TRUSTED_PROXIES: "2"
+      CORS_ORIGINS: ${PUBLIC_URL:-http://localhost:8000}
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8000}:80"
